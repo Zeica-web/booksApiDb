@@ -68,12 +68,50 @@ namespace booksApiDb
 
             });
 
-            app.MapPost("/postBook", async (BooksContext db, Book book) => {
+            app.MapPost("/createBook", async (BooksContext db, Book book) => {
 
                 db.Books.Add(book);
                 await db.SaveChangesAsync();
                 return Results.Created($"/createBook/{book.Id}", book);
 
+            });
+
+            app.MapDelete("/deleteBook/{id}", async (BooksContext db, int id) =>
+            {
+                var book = await db.Books.FindAsync(id);
+
+                if (book is null)
+                {
+                    return Results.NotFound($"Book with ID {id} was not found.");
+                }
+
+                db.Books.Remove(book);
+                await db.SaveChangesAsync();
+
+                return Results.NoContent();
+            });
+
+            app.MapPut("/updateBook/{id}", async (BooksContext db, int id, Book updatedBook) =>
+            {
+                // Find the existing book in the database
+                var existingBook = await db.Books.FindAsync(id);
+
+                // Return 404 if the book doesn't exist
+                if (existingBook is null)
+                {
+                    return Results.NotFound($"Book with ID {id} was not found.");
+                }
+
+                // Update the scalar properties
+                existingBook.Title = updatedBook.Title;
+                existingBook.Description = updatedBook.Description;
+                existingBook.GenreId = updatedBook.GenreId;
+
+                //  Save changes to SQLite
+                await db.SaveChangesAsync();
+
+                // Return 204 No Content (or Results.Ok(existingBook))
+                return Results.NoContent();
             });
 
 
