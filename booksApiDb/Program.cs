@@ -53,6 +53,12 @@ namespace booksApiDb
                 return Results.Ok(genres);
             });
 
+            app.MapGet("/getBooks", async (BooksContext db) =>
+            {
+                var books = await db.Books.ToListAsync();
+                return Results.Ok(books);
+            });
+
             app.MapGet("/getBooksByGenre/{genreId}", async (int genreId, BooksContext db) =>
 
             {
