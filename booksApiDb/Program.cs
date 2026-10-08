@@ -17,7 +17,7 @@ namespace booksApiDb
             {
                 options.AddPolicy("NextJsPolicy", policy =>
                 {
-                    policy.WithOrigins("http:localhost:3000")
+                    policy.WithOrigins("http://localhost:3000")
                     .AllowAnyMethod()
                     .AllowAnyHeader();
                 });
@@ -68,7 +68,18 @@ namespace booksApiDb
 
             });
 
+            app.MapPost("/postBook", async (BooksContext db, Book book) => {
+
+                db.Books.Add(book);
+                await db.SaveChangesAsync();
+                return Results.Created($"/createBook/{book.Id}", book);
+
+            });
+
+
             app.Run();
+
+          
         }
     }
 }
